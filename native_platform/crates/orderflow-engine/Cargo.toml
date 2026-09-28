@@ -1,0 +1,28 @@
+[package]
+name = "orderflow-engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[dependencies]
+market-types = { path = "../market-types" }
+# Used only by src/bin/l2_dump.rs, which calls the market-profile-engine value area
+# (ADR 0037) rather than a copy of it.
+chrono.workspace = true
+market-profile-engine = { path = "../market-profile-engine" }
+
+[dev-dependencies]
+chrono = "0.4"
+proptest.workspace = true
+serde_json.workspace = true
+
+# Parity dump for historical/tests/test_l2_parity_{cvd,tpo}.py; no `required-features`,
+# so clippy and `cargo test` always build it.
+[[bin]]
+name = "l2_dump"
+path = "src/bin/l2_dump.rs"
+
+[lints]
+workspace = true

@@ -1,0 +1,85 @@
+# prof_tpo_poc_pts_v1: point of control of the session TPO (time-price-opportunity) profile.
+# Canonical value area: native_platform/crates/market-profile-engine/src/lib.rs, anchored for
+# Python by shared/quant_core/testdata/value_area_golden.json. POC by volume is a different
+# feature (prof_vpoc_pts_v1).
+schema: l2.feature/1
+feature: prof_tpo_poc_pts_v1
+family: prof
+title: TPO point of control, canonical value-area v1
+unit: pts
+dtype: float64
+cadence: session
+
+signal:
+  causal: true
+  lookahead_ms: 0
+  window_start_rule: session_open
+  event_time_rule: session_close   # D's POC is knowable at D's close; lag it at query time
+  is_final_rule: session_close
+
+inputs:
+  - layer: L0
+    table: default.vn30f_trades
+    columns: [event_timestamp, price]   # no volume: a TPO counts the periods a price traded in
+depends_on: []
+
+params:
+  default:
+    cadence: session
+    symbol_scope: single
+    session_reset: open
+    seam_13h: none            # the ICT lunch break does not split a full-session profile
+    warmup_bars: 0
+    session: ict_full         # the ICT trading session, not the calendar date
+    price_bucket_tick: 1      # integer ticks (1 tick = 0.1 pt, costs.py), never a float bucket
+    tpo_period_min: 30        # market-profile-engine/src/lib.rs:17
+    va_pct: 0.70              # lib.rs:16, profile.py:44, volume_profile.rs:36
+    va_tiebreak: lower        # Rust expands with a strict `>` [lib.rs:390-410]
+    poc_tiebreak: mid_then_higher   # nearest mid-range, then the higher price [lib.rs:371-383]
+
+impl:
+  rust: native_platform/crates/market-profile-engine/src/lib.rs::value_area_from_pairs
+  # private; the parity test reaches it through build_tpo_profile_from_ticks, which also
+  # covers the price and 30-minute period bucketing
+  python: historical/l2/producers/prof_tpo.py::produce
+  # delegates the reduction to shared/quant_core/profile.py::value_area
+  authority: rust
+
+parity:
+  tolerance: 0                # bitwise; both dumps emit integer ticks
+  tolerance_reason: null
+  golden_tape: historical/tests/fixtures/l2_prof_tpo_synthetic_20210304_20210305.csv
+  test: historical/tests/test_l2_parity_tpo.py::test_rust_and_python_agree_bitwise
+
+derives_trigger: poc_reaction_v1
+maps_to_validation_state: offline-replayed
+
+status: PARITY
+pinned_code_version: null
+supersedes: null
+superseded_by: null
+retention: unbounded
+note: >-
+  Choosing lib.rs as v1 leaves orderflow-engine/src/volume_profile.rs and
+  the Signal Atlas profile module (not distributed) as two implementations that must be deleted or renamed _v2/_v3.
+  That touches live code and is tracked outside this file. The scalar reductions
+  (poc, vah, val, va_width) live in default.l2_observation; the price-by-price
+  DISTRIBUTION they are reduced from goes to default.l2_profile, keyed by integer ticks.
+  Both shapes are produced (--emit observation | profile) and both are compared bitwise;
+  checking only the scalars would let the two stacks build different histograms that
+  happen to reduce to the same three numbers on this tape.
+  THE TUPLE-ORDER TRAP IS TESTED, NOT JUST DOCUMENTED: market-profile-engine returns
+  (poc, VAH, VAL) and three other implementations return (poc, VAL, VAH), which
+  value_area_golden.json cannot see because it compares by field NAME. The parity test
+  compares named COLUMNS, asserts val <= poc <= vah on every observation on BOTH sides,
+  and carries a mutation that swaps VAH/VAL; injecting that swap into the producer on
+  2026-09-06 turned 7 of the 16 tests red, so the assertion is load-bearing.
+next_action: >-
+  Parity is green (2026-09-06): the Rust l2_dump and the Python producer are
+  byte-identical on both emitted shapes - 2 observation rows and 294 profile rows over
+  two sessions - at tolerance 0. Mutations proven to change the answer on this tape:
+  VAH/VAL swap, va_pct 0.70 -> 0.68, tpo_period_min 30 -> 60 and -> 15, and the
+  first-argmax POC tie-break that the real-time viewer's profile metrics (not distributed)
+  serves live today. Next gate is LIVE, which needs migration 009 applied and a backfill
+  run - neither has happened, so this feature writes nothing yet. Still owed and NOT part
+  of this gate: renaming or deleting the two non-canonical value areas per Q3.

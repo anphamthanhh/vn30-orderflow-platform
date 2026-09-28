@@ -1,0 +1,76 @@
+# ob_depth_top10_lot_v1: visible per-side depth over the ten published levels, in lots.
+#   D = 0.5 * (sum(bid_volumes[1..10]) + sum(offer_volumes[1..10]))
+# `top10` names the level set; the 0.5 makes it per-side depth, comparable with the queue a
+# passive order joins. Depth beyond these levels is ob_depth_resid_lot_v1.
+schema: l2.feature/1
+feature: ob_depth_top10_lot_v1
+family: ob
+title: Per-side visible depth over the ten published levels, end-of-minute
+unit: lot
+dtype: float64
+cadence: m1
+
+signal:
+  causal: true
+  lookahead_ms: 0
+  window_start_rule: bar_open
+  event_time_rule: bar_close
+  is_final_rule: every_bar
+
+inputs:
+  - layer: L0
+    table: default.vn30f_orderbook
+    columns: [event_timestamp, bid_volumes, offer_volumes]
+depends_on: []
+
+params:
+  default:
+    cadence: m1
+    symbol_scope: single
+    session_reset: none
+    seam_13h: none
+    warmup_bars: 0
+    levels: 10                  # must match `top10` in the name
+    agg: last
+    stale_ms: 0
+
+impl:
+  rust: null
+  python: historical/l2/producers/book_cost.py::depth_top10_lot
+  authority: python
+
+parity:
+  tolerance: 0                  # integer sums; 0.5 * integer is exact in f64
+  tolerance_reason: null
+  golden_tape: historical/tests/fixtures/book_cost_book_synthetic_20210304_20210305.csv
+  test: historical/tests/test_l2_book_cost.py::test_depth_top10_matches_hand_computed_golden_vector
+  parity_waiver: >-
+    No Rust implementation of THIS quantity exists. The two Rust sums of book volume are
+    dom_micro.rs:70 (total_bid_qty + total_offer_qty - the whole book, not the ten levels)
+    and dom_micro.rs:98 (an unhalved sum over whichever levels the DOM widget is currently
+    displaying, computed inside a UI label rather than in an engine crate, so its level
+    set is a rendering decision). Neither is this formula: one uses a different input, the
+    other a different level set and no halving. Naming either as impl.rust to obtain a
+    parity test would assert that three different numbers are one quantity - the precise
+    defect this layer was built to stop - and the numbers differ by ~19x, so the mistake
+    would not be cosmetic. Replaced by: a hand-computed golden vector worked out step by
+    step in the named test; a property test that D equals half the two side sums and is
+    >= 0 across every state of the frozen fixture (6,581 real states in the original); and a mutation test dropping the 0.5, which
+    doubles every value.
+
+derives_trigger: null
+maps_to_validation_state: offline-replayed
+
+status: PARITY
+pinned_code_version: null
+supersedes: null
+superseded_by: null
+retention: unbounded
+note: >-
+  Visible depth only. The size resting BEYOND these ten levels is a separate feature,
+  ob_depth_resid_lot_v1, and it is the larger of the two by roughly 18x on the fixture - so
+  reading this number as "how much size is there" would be wrong by an order of magnitude.
+next_action: >-
+  Owed: `agg: median` needs a feature_boundary vocabulary change before it can be declared
+  here. If an engine-side depth is ever written in Rust, this waiver must be deleted and a
+  real bitwise parity test put in its place.

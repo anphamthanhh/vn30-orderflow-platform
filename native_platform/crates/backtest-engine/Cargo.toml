@@ -1,0 +1,25 @@
+[package]
+name = "backtest-engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[dependencies]
+market-types = { path = "../market-types" }
+orderflow-engine = { path = "../orderflow-engine" }
+signal-engine = { path = "../signal-engine" }
+strategy-core = { path = "../strategy-core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "backtest"
+path = "src/bin/backtest.rs"

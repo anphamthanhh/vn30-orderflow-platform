@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vn30-orderflow-platform"
+version = "0.1.0"
+description = "VN30F1M order-flow and research platform: derivatives cost model, basis screen, L2 feature parity (Python half), validation statistics."
+readme = "README.md"
+requires-python = ">=3.13"
+license = "LicenseRef-Evaluation"
+license-files = ["LICENSE"]
+authors = [{ name = "Pham Thanh An" }]
+keywords = ["vn30", "index-futures", "market-microstructure", "transaction-costs", "backtesting"]
+dependencies = [
+    "numpy>=2.5",
+    "pandas>=3.0",
+    "scipy>=1.18",
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=9.1"]
+demos = ["matplotlib>=3.11"]
+# only for code that talks to live services (ClickHouse loaders, paper-account probe); tests do not
+live = ["requests", "redis", "clickhouse-connect"]
+
+[tool.setuptools.packages.find]
+include = ["historical*", "shared*", "data_provider*"]
+
+[tool.pytest.ini_options]
+minversion = "9.0"
+testpaths = ["historical/tests", "data_provider/tests"]
+pythonpath = ["."]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-ra --strict-markers"
+markers = [
+    "slow: needs a live ClickHouse server; skips cleanly when unreachable",
+]
+# Expected registry warning: two feature specs name a trigger defined outside this repository
+# (see docs/provenance.md).
+filterwarnings = [
+    "ignore:.*derives_trigger. could not be checked.*client-desktop:UserWarning",
+]

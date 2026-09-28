@@ -1,0 +1,62 @@
+# tape_cvd_norst_lot_v1: cumulative volume delta that never resets.
+# A separate feature rather than a parameter of tape_cvd_lot_v1, so each name keeps a single
+# definition (ADR 0037).
+schema: l2.feature/1
+feature: tape_cvd_norst_lot_v1
+family: tape
+title: Cumulative volume delta, no reset, cumulative over the whole tape
+unit: lot
+dtype: float64
+cadence: m1
+
+signal:
+  causal: true
+  lookahead_ms: 0
+  window_start_rule: bar_open
+  event_time_rule: bar_close
+  is_final_rule: every_bar
+
+inputs:
+  - layer: L0
+    table: default.vn30f_trades
+    columns: [event_timestamp, price, volume, aggressor]
+depends_on: []
+
+params:
+  default:
+    cadence: m1
+    symbol_scope: single
+    session_reset: none       # never resets (tape_cvd_lot_v1 resets at the open)
+    seam_13h: none            # no lunch rollover either: one unbroken sum
+    warmup_bars: 0
+    sign_method: venue_flag
+    unknown_side: zero        # 'U' contributes 0, as in tape_cvd_lot_v1
+    window: {value: 1, unit: bar}
+
+impl:
+  rust: native_platform/crates/orderflow-engine/src/cvd.rs::CvdTracker
+  python: historical/l2/producers/tape_cvd.py::produce
+  authority: rust
+
+parity:
+  tolerance: 0
+  tolerance_reason: null
+  golden_tape: historical/tests/fixtures/l2_tape_cvd_synthetic_20210304_20210305.csv
+  test: historical/tests/test_l2_parity_cvd.py::test_rust_and_python_agree_bitwise
+
+derives_trigger: null
+maps_to_validation_state: offline-replayed
+
+status: PARITY
+pinned_code_version: null
+supersedes: null
+superseded_by: null
+retention: unbounded
+note: >-
+  Bitwise-identical across Rust and Python over the same fixture (10,345 real steps in the original) as
+  tape_cvd_lot_v1. test_the_two_features_are_actually_different_series asserts the two
+  dumps DIFFER, so this name cannot decay into a cosmetic alias of the other, and
+  test_the_day_boundary_does_reset pins that this one does NOT reset where _v1 does.
+next_action: >-
+  Same gate as tape_cvd_lot_v1: LIVE needs migration 009 applied and a backfill run.
+  Neither has happened, so this feature writes nothing yet.

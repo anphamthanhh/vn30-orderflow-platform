@@ -1,0 +1,268 @@
+{
+  "note": "Golden fixture pinning the CANONICAL value area across both stacks. Authority: market-profile-engine::value_area_from_pairs. Python mirror: shared/quant_core/profile.py::value_area. Rules: POC ties -> nearest to mid-range, then higher price; expansion is one level per step and an equal-weight tie takes the LOWER side; the band is always contiguous.",
+  "cases": [
+    {
+      "name": "unimodal",
+      "value_area_pct": 0.7,
+      "rows": [
+        [
+          900.0,
+          1
+        ],
+        [
+          900.1,
+          3
+        ],
+        [
+          900.2,
+          10
+        ],
+        [
+          900.3,
+          4
+        ],
+        [
+          900.4,
+          1
+        ]
+      ],
+      "expected": {
+        "poc": 900.2,
+        "val": 900.2,
+        "vah": 900.3
+      }
+    },
+    {
+      "name": "poc_tie_nearer_midrange_wins",
+      "value_area_pct": 0.7,
+      "rows": [
+        [
+          900.0,
+          5
+        ],
+        [
+          900.1,
+          1
+        ],
+        [
+          900.2,
+          5
+        ],
+        [
+          900.3,
+          1
+        ],
+        [
+          900.4,
+          1
+        ]
+      ],
+      "expected": {
+        "poc": 900.2,
+        "val": 900.0,
+        "vah": 900.2
+      }
+    },
+    {
+      "name": "poc_tie_equidistant_higher_wins",
+      "value_area_pct": 0.7,
+      "rows": [
+        [
+          900.0,
+          5
+        ],
+        [
+          900.1,
+          1
+        ],
+        [
+          900.2,
+          1
+        ],
+        [
+          900.3,
+          1
+        ],
+        [
+          900.4,
+          5
+        ]
+      ],
+      "expected": {
+        "poc": 900.4,
+        "val": 900.0,
+        "vah": 900.4
+      }
+    },
+    {
+      "name": "expansion_tie_takes_lower_side",
+      "value_area_pct": 0.7,
+      "rows": [
+        [
+          900.0,
+          2
+        ],
+        [
+          900.1,
+          3
+        ],
+        [
+          900.2,
+          10
+        ],
+        [
+          900.3,
+          3
+        ],
+        [
+          900.4,
+          2
+        ]
+      ],
+      "expected": {
+        "poc": 900.2,
+        "val": 900.1,
+        "vah": 900.3
+      }
+    },
+    {
+      "name": "disjoint_decoy_must_not_be_pulled_in",
+      "value_area_pct": 0.7,
+      "rows": [
+        [
+          900.0,
+          9
+        ],
+        [
+          900.1,
+          1
+        ],
+        [
+          900.2,
+          2
+        ],
+        [
+          900.3,
+          6
+        ],
+        [
+          900.4,
+          10
+        ],
+        [
+          900.5,
+          7
+        ],
+        [
+          900.6,
+          2
+        ],
+        [
+          900.7,
+          1
+        ]
+      ],
+      "expected": {
+        "poc": 900.4,
+        "val": 900.2,
+        "vah": 900.6
+      }
+    },
+    {
+      "name": "single_level",
+      "value_area_pct": 0.7,
+      "rows": [
+        [
+          1234.5,
+          42
+        ]
+      ],
+      "expected": {
+        "poc": 1234.5,
+        "val": 1234.5,
+        "vah": 1234.5
+      }
+    },
+    {
+      "name": "pct_one_covers_everything",
+      "value_area_pct": 1.0,
+      "rows": [
+        [
+          900.0,
+          1
+        ],
+        [
+          900.1,
+          2
+        ],
+        [
+          900.2,
+          3
+        ]
+      ],
+      "expected": {
+        "poc": 900.2,
+        "val": 900.0,
+        "vah": 900.2
+      }
+    },
+    {
+      "name": "left_exhausted_forces_right",
+      "value_area_pct": 0.9,
+      "rows": [
+        [
+          900.0,
+          10
+        ],
+        [
+          900.1,
+          1
+        ],
+        [
+          900.2,
+          1
+        ],
+        [
+          900.3,
+          1
+        ]
+      ],
+      "expected": {
+        "poc": 900.0,
+        "val": 900.0,
+        "vah": 900.2
+      }
+    },
+    {
+      "name": "flat_profile_all_equal",
+      "value_area_pct": 0.7,
+      "rows": [
+        [
+          900.0,
+          1
+        ],
+        [
+          900.1,
+          1
+        ],
+        [
+          900.2,
+          1
+        ],
+        [
+          900.3,
+          1
+        ],
+        [
+          900.4,
+          1
+        ]
+      ],
+      "expected": {
+        "poc": 900.2,
+        "val": 900.0,
+        "vah": 900.3
+      }
+    }
+  ]
+}

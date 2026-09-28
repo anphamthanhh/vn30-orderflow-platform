@@ -1,0 +1,83 @@
+# ob_spread_roll_pts_v1: Roll (1984) effective spread, in points.
+#   S = 2 * sqrt(-cov(dp_t, dp_{t-1}))   over daily close-to-close price changes
+# Undefined when cov >= 0: the session emits no row rather than a spread of 0.0.
+schema: l2.feature/1
+feature: ob_spread_roll_pts_v1
+family: ob
+title: Roll effective spread from the serial covariance of daily price changes
+unit: pts
+dtype: float64
+cadence: session            # one row per ICT trading session (the daily cadence)
+
+signal:
+  causal: true
+  lookahead_ms: 0
+  window_start_rule: trailing_window   # the 21 sessions ending at D, never centred
+  event_time_rule: session_close
+  is_final_rule: session_close
+
+inputs:
+  - layer: L1
+    table: default.ohlcv_m1
+    columns: [time_1m, close]
+depends_on: []
+
+params:
+  default:
+    cadence: session
+    symbol_scope: single
+    session_reset: open
+    seam_13h: none
+    warmup_bars: 12           # 10 lagged pairs need 11 price changes, i.e. 12 sessions
+    levels: 1                 # required for family `ob`; no book level is read
+    agg: last
+    stale_ms: 0
+    session: calendar_day
+    window: {value: 21, unit: session}  # ~one trading month of price changes
+    cov_ddof: 1               # sample covariance, denominator n - 1
+    min_pairs: 10             # fewer usable lagged pairs -> undefined
+    gap_policy: drop_data_gap # pairs only within a contiguous run of sessions in the tape
+    roll_boundary: exclude    # no price change across a contract roll
+
+impl:
+  rust: null                  # the live engine computes no daily-cadence estimator
+  python: historical/l2/producers/daily_micro.py::produce
+  authority: python
+
+parity:
+  tolerance: 0
+  tolerance_reason: null
+  golden_tape: historical/tests/fixtures/daily_micro_golden_v1.json
+  test: historical/tests/test_l2_daily_micro.py::test_roll_golden_alternating_deltas_closed_form
+  parity_waiver: >-
+    No Rust implementation exists and none is planned: the live engine computes no
+    daily-cadence estimator, so a cross-stack comparison is undefined rather than
+    merely unwritten. The substitute evidence is in
+    historical/tests/test_l2_daily_micro.py: (1) a golden vector computed by hand in
+    exact rational arithmetic - the alternating series [+2,-2,+2,-2] gives
+    cov = -16/3 and S = 8/sqrt(3), a closed form this code never produces; (2) a
+    50-digit decimal re-implementation frozen in fixtures/daily_micro_golden_v1.json;
+    (3) property invariants, in particular that cov >= 0 returns None and never 0.0;
+    (4) mutation tests - deleting the cov < 0 guard and ignoring segment boundaries
+    each turn a named test red. If a Rust implementation ever lands, this waiver must
+    be DELETED and replaced by a parity test.
+
+derives_trigger: null
+maps_to_validation_state: offline-replayed
+
+status: IMPLEMENTED
+pinned_code_version: null
+supersedes: null
+superseded_by: null
+retention: unbounded
+note: >-
+  Ships with ob_spread_cs_pts_v1 and ob_illiq_amihud_v1 as three INDEPENDENT
+  estimators of one quantity: convergence is evidence, divergence localises a
+  mis-specification, and reading one alone discards both. Roll answers on strictly
+  fewer sessions than CS by construction, so a coverage difference between the two is
+  expected and is not a defect.
+next_action: >-
+  Status is IMPLEMENTED, not PARITY: nothing is backfilled and migration
+  009_l2_observations.sql is unapplied, so this feature writes no rows.
+  test_registry_entry_passes_the_writeable_gate asserts the entry would pass the
+  writeable-status gate as written.

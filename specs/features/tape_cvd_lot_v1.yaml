@@ -1,0 +1,64 @@
+# tape_cvd_lot_v1: cumulative volume delta, reset at the session open with a 13:00 rollover,
+# matching native_platform/crates/orderflow-engine/src/cvd.rs. The never-resetting variant is
+# a separate feature, tape_cvd_norst_lot_v1.
+schema: l2.feature/1
+feature: tape_cvd_lot_v1
+family: tape
+title: Cumulative volume delta, session-reset with a 13:00 rollover
+unit: lot
+dtype: float64
+cadence: m1                 # per_update is refused by feature_boundary (size budget)
+
+signal:
+  causal: true
+  lookahead_ms: 0           # must be 0 while causal: true
+  window_start_rule: bar_open
+  event_time_rule: bar_close      # when the value became knowable
+  is_final_rule: every_bar
+
+inputs:
+  - layer: L0
+    table: default.vn30f_trades
+    columns: [event_timestamp, price, volume, aggressor]
+depends_on: []
+
+params:
+  default:
+    cadence: m1
+    symbol_scope: single
+    session_reset: open
+    seam_13h: rollover
+    warmup_bars: 0
+    sign_method: venue_flag     # the stored `aggressor` column (Lee-Ready, classified at ingest)
+    unknown_side: zero          # 'U' contributes 0 on both stacks
+    window: {value: 1, unit: bar}
+
+impl:
+  rust: native_platform/crates/orderflow-engine/src/cvd.rs::CvdTracker
+  python: historical/l2/producers/tape_cvd.py::produce
+  authority: rust
+
+parity:
+  tolerance: 0                # bitwise: a signed sum of integer volume is exact in f64 to 2^53
+  tolerance_reason: null
+  golden_tape: historical/tests/fixtures/l2_tape_cvd_synthetic_20210304_20210305.csv
+  test: historical/tests/test_l2_parity_cvd.py::test_rust_and_python_agree_bitwise
+
+derives_trigger: cvd_divergence_v1
+maps_to_validation_state: offline-replayed
+
+status: PARITY
+pinned_code_version: null
+supersedes: null
+superseded_by: null
+retention: unbounded          # a named retention policy (ADR 0032 §6)
+note: >-
+  Reset at session open plus a 13:00 rollover (keep the LEVEL, drop the history) is the
+  sig001/pure_cvd behaviour and matches CvdTracker::rollover in cvd.rs. cvd_exhaustion - a strategy that
+  already has a backtest - uses the NO-reset variant, which is why that variant gets its
+  own name rather than a second meaning for this one.
+next_action: >-
+  Parity is green (2026-09-05): the Rust l2_dump dump and the Python producer are
+  byte-identical over 10,345 steps of the original real tape at tolerance 0. Next gate is LIVE, which needs
+  migration 009 applied and a backfill run - neither has happened, so this feature
+  writes nothing yet.

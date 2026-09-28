@@ -1,0 +1,161 @@
+{
+  "schema": "research_lab.holdout_lock/3",
+  "locked_at_ict_date": "2026-08-14",
+  "cutoff_ict_date": "2026-08-12",
+  "reserved_ranges": [
+    {
+      "from_ict_date": "2024-01-01",
+      "to_ict_date": "2026-03-04",
+      "reason": "Multi-year bar holdout, pre-registered 2026-08-14 the moment default.ohlcv_m1 (2017-11-06..2026-03-04, 2073 days, real OHLC+volume) appeared in ClickHouse and BEFORE any price-path analysis of it (only aggregate row-count/quality stats were seen). ~26% of the history. Spent once, at final verdict."
+    }
+  ],
+  "rule": "Reserved = any session inside a reserved_range, plus any session strictly after cutoff_ict_date (the original future-sessions lock). Reserved sessions get no eyeballing, no plotting, no gate run, no parameter selection until a strategy's FINAL verdict, and are spent exactly once. DEV set = 2017-11-06..2023-12-31 (bars) and 2026-07-16..2026-08-12 (the tick window, already eyeballed and therefore burned for OOS anyway).",
+  "why": "E3: a clean holdout must be genuinely unseen. The old dev tape was eyeballed to death; the new multi-year bar history is NOT - locking a fifth of it away NOW, before exploration, buys the first honest large OOS this project has ever had (multiple regimes: 2024-2025 + 2026Q1).",
+  "enforced_by": "historical/research_lab/lab.py :: holdout_ranges(), is_holdout(ts), assert_dev_only(bars); export_clickhouse.py/export_orderbook.py :: assert_export_range_allowed(); basis_screen.py :: assert_export_range_allowed() (added 2026-08-25 - PREVIOUSLY UNGUARDED: basis_screen queried default.basis_m1 directly, bypassing the lock entirely); daily.py :: assert_dev_only_daily(), wired into daily_bars() (added 2026-09-01 - PREVIOUSLY UNGUARDED: daily.load_m1 reads data_provider/VN30F1M_Final.csv directly, which spans the whole reserved range, and there was no export step to gate. This is the SECOND lane found bypassing the lock by the same mechanism as basis_screen.py; PRE_REGISTRATION A12.6 makes guard coverage a standing precondition so there is not a third.)",
+  "spent": [
+    {
+      "range": "2024-01-01..2026-03-04",
+      "on_ict_date": "2026-08-14",
+      "by": "S5 slow-trend h1 p20 m3 (one-shot)",
+      "verdict": "KILL-for-deployment (net-positive OOS +13% but fails beats-buy&hold: Sharpe 0.43 vs 1.45, +13% vs +81%). SPENT \u2014 this range cannot re-validate any slow-trend tweak; future variants need future data."
+    },
+    {
+      "range": "2025-08-01..2026-03-04 (basis_m1 daily pairs, ~145 of X1 227)",
+      "on_ict_date": "2026-08-16..2026-08-17 (retroactively recorded 2026-08-25)",
+      "by": "X1 basis reversion \u2014 basis_screen.py, run 3x (original screen, ADR-0020 re-screen, functional check)",
+      "verdict": "BURNED-WITHOUT-AUTHORISATION. basis_screen.py never called assert_export_range_allowed, so the reserved range was read outside the guard. Consequence per PRE_REGISTRATION amendment A3: ALL X1 historical figures (IC -0.095, gross 2.898pt, net +1.468pt) are reclassified HYPOTHESIS-GENERATION ONLY and may not be cited as validation. The X1 FORWARD card stands unaffected (no forward rows had accrued). This range can no longer OOS-validate any basis variant."
+    },
+    {
+      "range": "2024-01-01..2026-03-04 (all 536 reserved sessions, daily OHLC)",
+      "on_ict_date": "2026-08-14..2026-08-17 (retroactively discovered and recorded 2026-09-01)",
+      "by": "C2 overnight-calendar, C3 day-type-persistence, C8 expiry-roll (and the C7 SCREEN figures, already noted in PRE_REGISTRATION A9 Defect 1) - via run_screens.py, which defaults to load_m1() on the FULL CSV and calls daily.daily_bars() with no range restriction.",
+      "verdict": "BURNED-WITHOUT-AUTHORISATION. PROVEN ARITHMETICALLY, not inferred: the '2,073 sessions' these cards publish is exactly dev (1,537) + the entire reserved range (536). daily.py had no holdout guard of any kind - the same failure mode as the X1/basis_screen.py burn above, in a second lane. Consequence per A12.4: every figure computed on that window is HYPOTHESIS-GENERATION ONLY and may not be cited as validation - this covers C2's overnight_all +0.624pt/night t=+4.48 and its per-weekday windows, C3's delta -0.034, and C8's descriptive expiry-roll stats. MITIGATION, recorded honestly: all three were KILLs, and A12.3 clause 3 treats a KILL the holdout could only confirm as a legitimate spend - so the substantive damage is small and no card was promoted on this data. What was wrong is that it was UNRECORDED, leaving holdout_lock.json asserting a cleanliness that did not hold. This range can no longer OOS-validate any calendar/seasonality/day-type variant. NOTE: C2's venue fact (overnight std ~6.9pt >> fee) is load-bearing for N1/C7/X1 reasoning across the programme and is now hypothesis-generation only; it should be re-measured dev-only before it is leaned on again."
+    }
+  ],
+  "dev_ranges": [
+    {
+      "from_ict_date": "2017-11-06",
+      "to_ict_date": "2023-12-31",
+      "note": "The multi-year bar era. 1,537 sessions. Applies to any source whose coverage reaches back here (today: ohlcv_m1 only)."
+    },
+    {
+      "from_ict_date": "2026-03-05",
+      "to_ict_date": "2026-08-12",
+      "note": "The recent-regime window: the day after the reserved bar range ends, through the global cutoff. 112 sessions (measured by V11's export, 2026-09-02). Read by V11 and V12 - it is DEV-legal but no longer unseen."
+    }
+  ],
+  "dev_rule": "DEV = a session inside dev_ranges AND inside the queried source's own sources[].dev_ranges. Anything else is RESERVED. Stated positively on purpose: 'not reserved' is how the three burns happened - a lane that never asked the lock read whatever the file it opened contained. A source whose coverage starts after a dev range starts simply has a shorter dev window; it never inherits a wider one.",
+  "source_rule": "Every source carries its OWN boundary because coverage differs by years and because two cutoffs are in play (this lock's 2026-08-12 and the X1 card's 2026-08-14). Where they differ the STRICTER date governs - c7_recorder.py already does this and it is now the written rule. A source marked guarded_by: null has no executable guard yet and may not be read by a screen until one exists (A12.6).",
+  "coverage_verified_on": "2026-08-25",
+  "coverage_verified_note": "Coverage rows below were read off the live cluster on 2026-08-25 and were NOT re-verified on 2026-09-02 (database VM unreachable, ClickHouse 8123 timeout). Coverage may have grown; the BOUNDARIES do not move with it - they are frozen dates.",
+  "sources": [
+    {
+      "source": "bars_m1",
+      "table": "default.ohlcv_m1",
+      "grain": "M1 bars",
+      "coverage_ict": "2017-11-06..2026-08-25",
+      "dev_ranges": [
+        "2017-11-06..2023-12-31",
+        "2026-03-05..2026-08-12"
+      ],
+      "reserved_ranges": [
+        "2024-01-01..2026-03-04",
+        "2026-08-13.."
+      ],
+      "cutoff_ict_date": "2026-08-12",
+      "guarded_by": "lab.assert_dev_only / lab.assert_dev_only_days / daily.assert_dev_only_daily / export_clickhouse.assert_export_range_allowed",
+      "spent": "YES - the whole 2024-01-01..2026-03-04 range (S5 authorised; C2/C3/C8/C7-screen unauthorised). Cannot OOS-validate trend, calendar, day-type or expiry variants."
+    },
+    {
+      "source": "basis_m1",
+      "table": "default.basis_m1",
+      "grain": "M1 -> daily pairs",
+      "coverage_ict": "2025-08-01..2026-08-28",
+      "dev_ranges": [
+        "2026-03-05..2026-08-12"
+      ],
+      "reserved_ranges": [
+        "2025-08-01..2026-03-04",
+        "2026-08-13.."
+      ],
+      "cutoff_ict_date": "2026-08-12 (this lock) - the X1 card says 2026-08-14; the stricter, 08-12, governs",
+      "guarded_by": "basis_screen.assert_export_range_allowed (added 2026-08-25) + lab.assert_dev_only_source('basis_m1', days) (added 2026-09-02)",
+      "spent": "YES for 2025-08-01..2026-03-04 - X1 burned it unguarded (~145 of 227 daily pairs, A3). What is left is ~112 DEV-legal sessions in 2026-03-05..08-12, the SAME window V11/V12 read. Any basis study is therefore capped at ~112 sessions and has no unseen range at all: state its min-N before opening it (A-min-N / F5)."
+    },
+    {
+      "source": "orderbook",
+      "table": "default.vn30f_orderbook",
+      "grain": "per-update L2, 10 levels (settled 2026-09-02: the DNSE topprice feed delivers 10, not 5)",
+      "coverage_ict": "2026-05-04..2026-08-25",
+      "dev_ranges": [
+        "2026-05-04..2026-08-12"
+      ],
+      "reserved_ranges": [
+        "2026-08-13.."
+      ],
+      "cutoff_ict_date": "2026-08-12",
+      "guarded_by": "export_orderbook.assert_export_range_allowed",
+      "spent": "NO reserved range read. But the dev part is EYEBALLED (E1, E1-OPEN design, C2 OFI) - it is dev, not a holdout, and must not be cited as OOS."
+    },
+    {
+      "source": "trades",
+      "table": "orderflow.trades_raw",
+      "grain": "tick",
+      "coverage_ict": "2026-07-16..2026-08-25",
+      "dev_ranges": [
+        "2026-07-16..2026-08-12"
+      ],
+      "reserved_ranges": [
+        "2026-08-13.."
+      ],
+      "cutoff_ict_date": "2026-08-12",
+      "guarded_by": "export_clickhouse.assert_export_range_allowed",
+      "spent": "NO reserved range read. The dev tick window is the original 'eyeballed to death' tape - BURNED for OOS claims by exploration, per the why field."
+    },
+    {
+      "source": "profile_tpo",
+      "table": "default.profile_tpo_agg",
+      "grain": "30-min TPO buckets",
+      "coverage_ict": "2026-05-04..2026-08-25",
+      "dev_ranges": [
+        "2026-05-04..2026-08-12"
+      ],
+      "reserved_ranges": [
+        "2026-08-13.."
+      ],
+      "cutoff_ict_date": "2026-08-12",
+      "guarded_by": "export_clickhouse.assert_export_range_allowed",
+      "spent": "NO. One regime only (~4 months), which is why the V-family builds its multi-year TPO substrate from ohlcv_m1 instead - and that substrate inherits the BAR lock, not this row."
+    },
+    {
+      "source": "foreign_flow",
+      "table": "default.vn30f_foreign_flow",
+      "grain": "intraday cumulative snapshots",
+      "coverage_ict": "2026-05-04..2026-08-25",
+      "dev_ranges": [
+        "2026-05-04..2026-08-12"
+      ],
+      "reserved_ranges": [
+        "2026-08-13.."
+      ],
+      "cutoff_ict_date": "2026-08-12",
+      "guarded_by": "export_clickhouse.assert_export_range_allowed",
+      "spent": "NO. C5/C3 used it and both were kills."
+    },
+    {
+      "source": "dom_snapshots",
+      "table": "default.dom_snapshots",
+      "grain": "derived DOM; per-update after ADR 0026, 1 Hz before it",
+      "coverage_ict": "writer live 2026-05-03; a 90-day TTL deleted roughly the first month before ADR 0026 removed it (migration 005 WRITTEN, NOT YET RUN as of 2026-09-02)",
+      "dev_ranges": [
+        "2026-05-03..2026-08-12"
+      ],
+      "reserved_ranges": [
+        "2026-08-13.."
+      ],
+      "cutoff_ict_date": "2026-08-12",
+      "guarded_by": null,
+      "spent": "NO - and NOT READABLE by a screen until it has a guard (A12.6). Use the raw vn30f_orderbook lane instead."
+    }
+  ]
+}

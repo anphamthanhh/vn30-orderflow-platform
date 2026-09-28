@@ -1,0 +1,16 @@
+{
+  "description": "PH-MP-002 regression: every level has equal volume (all tied at max). POC must be the price closest to the profile mid-range (1300.4 for range 1300.0..1300.8), not the first/lowest max. VA expands lower-side-first on equal neighbors: {1300.0..1300.6}.",
+  "value_area_pct": 0.7,
+  "levels": [
+    { "price": 1300.0, "volume": 100 },
+    { "price": 1300.1, "volume": 100 },
+    { "price": 1300.2, "volume": 100 },
+    { "price": 1300.3, "volume": 100 },
+    { "price": 1300.4, "volume": 100 },
+    { "price": 1300.5, "volume": 100 },
+    { "price": 1300.6, "volume": 100 },
+    { "price": 1300.7, "volume": 100 },
+    { "price": 1300.8, "volume": 100 }
+  ],
+  "expected": { "poc": 1300.4, "vah": 1300.6, "val": 1300.0, "va_volume": 700 }
+}

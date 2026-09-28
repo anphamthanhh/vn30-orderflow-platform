@@ -1,0 +1,88 @@
+# ob_spread_tod_ratio_v1: quoted spread relative to its own time-of-day baseline.
+#   value(d, m) = spread(d, m) / median{ spread(e, m) : e in the last N sessions before d }
+
+# m is the minute of session, so the intraday spread pattern (wider into the ATC) cancels.
+# Only earlier sessions enter the baseline and m is discrete, so the value is causal and
+# never bridges the lunch break or an overnight gap.
+schema: l2.feature/1
+feature: ob_spread_tod_ratio_v1
+family: ob
+title: Quoted spread divided by its trailing baseline for that minute of session
+unit: ratio
+dtype: float64
+cadence: m1
+
+signal:
+  causal: true
+  lookahead_ms: 0
+  window_start_rule: bar_open
+  event_time_rule: bar_close
+  is_final_rule: every_bar
+
+inputs:
+  - layer: L0
+    table: default.vn30f_orderbook
+    columns: [event_timestamp, bid_prices, offer_prices]
+depends_on: [ob_spread_pts_v1]
+
+params:
+  default:
+    cadence: m1
+    symbol_scope: single
+    session_reset: none
+    seam_13h: none
+    warmup_bars: 0              # warmup is in sessions: see baseline_min_sessions
+    levels: 1
+    agg: last
+    stale_ms: 0
+    baseline_key: minute_of_session
+    baseline_stat: median       # even count: mean of the two middle values
+    baseline_sessions: 20       # how many earlier sessions the baseline may use
+    baseline_min_sessions: 5    # below this, no row is emitted
+  short:
+    cadence: m1
+    symbol_scope: single
+    session_reset: none
+    seam_13h: none
+    warmup_bars: 0
+    levels: 1
+    agg: last
+    stale_ms: 0
+    baseline_key: minute_of_session
+    baseline_stat: median
+    baseline_sessions: 5
+    baseline_min_sessions: 1    # test-fixture set (two sessions); not for production reads
+
+impl:
+  rust: null
+  python: historical/l2/producers/book_cost.py::spread_tod_ratio
+  authority: python
+
+parity:
+  tolerance: 0
+  tolerance_reason: null
+  golden_tape: historical/tests/fixtures/book_cost_book_synthetic_20210304_20210305.csv
+  test: historical/tests/test_l2_book_cost.py::test_spread_tod_ratio_matches_hand_computed_golden_vector
+  parity_waiver: null           # not claimed; the feature is not at a writeable status
+
+derives_trigger: null
+maps_to_validation_state: offline-replayed
+
+status: IMPLEMENTED
+pinned_code_version: null
+supersedes: null
+superseded_by: null
+retention: unbounded
+note: >-
+  Emits no row when fewer than `baseline_min_sessions` earlier sessions carry that minute,
+  or when the baseline is <= 0 (a locked or crossed book divides into nonsense). Both are
+  silences, not zeros: a fabricated 1.0 would read as "normal" on exactly the days there
+  is no evidence of what normal is.
+next_action: >-
+  Held at IMPLEMENTED on purpose. A waiver would be legal here (no Rust implements this
+  ratio) but would be claiming a green gate for a number built on ob_spread_pts_v1, whose
+  own Rust twin - market-dom-engine::spread_from_best_levels - has never been diffed
+  against the Python. Emitting that dump means editing
+  orderflow-engine/src/bin/l2_dump.rs, which a parallel branch holds; this branch did not
+  contend for the file. Promote both together once the dump exists. Also owed: `agg:
+  median` needs a feature_boundary vocabulary change.

@@ -1,0 +1,67 @@
+{
+  "fixture": "historical/tests/fixtures/l2_tape_cvd_synthetic_20210304_20210305.csv",
+  "symbol": "VN30F1M",
+  "synthetic": true,
+  "days": [
+    "2021-03-04",
+    "2021-03-05"
+  ],
+  "why_these_days": "Synthetic sessions dated inside the DEV range 2017-11-06..2023-12-31 of holdout_lock.json, so the holdout guard accepts them; neither day is an expiry day (March 2021 expiry is the 18th).",
+  "source": "samples/synthetic/microstructure.py",
+  "generator_params": {
+    "seed": 20260923,
+    "days": [
+      "2021-03-04",
+      "2021-03-05"
+    ],
+    "regimes": [
+      "normal",
+      "normal"
+    ],
+    "start_mid": 1250.0,
+    "trades_per_sec": 8.5,
+    "imbalance_ar": 0.97,
+    "imbalance_sd": 0.25,
+    "trend_ticks_per_min": 0.6,
+    "balance_pull_per_sec": 0.004
+  },
+  "second_of_day_windows": [
+    [
+      32400,
+      32460
+    ],
+    [
+      37500,
+      37560
+    ],
+    [
+      39600,
+      39660
+    ],
+    [
+      41340,
+      41400
+    ],
+    [
+      46800,
+      46860
+    ],
+    [
+      47340,
+      47400
+    ],
+    [
+      53040,
+      53101
+    ]
+  ],
+  "aggressor_counts": {
+    "S": 2980,
+    "B": 2457,
+    "U": 4
+  },
+  "rows": 5441,
+  "header": "\"event_timestamp\",\"price\",\"volume\",\"aggressor\"",
+  "sha256_lf": "3cca44e265a0250bcf5fc699950059372d893dd51a8ffc4d0ef79de426a3e0eb",
+  "note": "SYNTHETIC. Pins formulas across the Python and Rust implementations; it says nothing about the real market."
+}

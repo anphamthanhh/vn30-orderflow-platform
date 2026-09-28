@@ -1,0 +1,305 @@
+[
+  {
+    "asks": [
+      {
+        "price": 1251.5,
+        "volume": 110
+      },
+      {
+        "price": 1251.6,
+        "volume": 120
+      },
+      {
+        "price": 1251.7,
+        "volume": 130
+      },
+      {
+        "price": 1251.8,
+        "volume": 140
+      },
+      {
+        "price": 1251.9,
+        "volume": 150
+      },
+      {
+        "price": 1252.0,
+        "volume": 160
+      },
+      {
+        "price": 1252.1,
+        "volume": 170
+      },
+      {
+        "price": 1252.2,
+        "volume": 180
+      },
+      {
+        "price": 1252.3,
+        "volume": 190
+      },
+      {
+        "price": 1252.4,
+        "volume": 200
+      }
+    ],
+    "best_ask": 1251.5,
+    "best_bid": 1251.4,
+    "bids": [
+      {
+        "price": 1251.4,
+        "volume": 100
+      },
+      {
+        "price": 1251.3,
+        "volume": 200
+      },
+      {
+        "price": 1251.2,
+        "volume": 300
+      },
+      {
+        "price": 1251.1,
+        "volume": 400
+      },
+      {
+        "price": 1251.0,
+        "volume": 500
+      },
+      {
+        "price": 1250.9,
+        "volume": 600
+      },
+      {
+        "price": 1250.8,
+        "volume": 700
+      },
+      {
+        "price": 1250.7,
+        "volume": 800
+      },
+      {
+        "price": 1250.6,
+        "volume": 900
+      },
+      {
+        "price": 1250.5,
+        "volume": 1000
+      }
+    ],
+    "last_trade": {
+      "price": 1251.4,
+      "side": "Buy",
+      "timestamp": 1000,
+      "volume": 5
+    },
+    "last_trade_price": 1251.4,
+    "malformed": false,
+    "spread": 0.1,
+    "symbol": "VN30F1M",
+    "timestamp": 1000,
+    "total_bid_qty": 5500,
+    "total_offer_qty": 1550
+  },
+  {
+    "asks": [
+      {
+        "price": 1251.6,
+        "volume": 115
+      },
+      {
+        "price": 1251.7,
+        "volume": 125
+      },
+      {
+        "price": 1251.8,
+        "volume": 135
+      },
+      {
+        "price": 1251.9,
+        "volume": 145
+      },
+      {
+        "price": 1252.0,
+        "volume": 155
+      },
+      {
+        "price": 1252.1,
+        "volume": 165
+      },
+      {
+        "price": 1252.2,
+        "volume": 175
+      },
+      {
+        "price": 1252.3,
+        "volume": 185
+      },
+      {
+        "price": 1252.4,
+        "volume": 195
+      },
+      {
+        "price": 1252.5,
+        "volume": 155
+      }
+    ],
+    "best_ask": 1251.6,
+    "best_bid": 1251.5,
+    "bids": [
+      {
+        "price": 1251.5,
+        "volume": 90
+      },
+      {
+        "price": 1251.4,
+        "volume": 210
+      },
+      {
+        "price": 1251.3,
+        "volume": 290
+      },
+      {
+        "price": 1251.2,
+        "volume": 410
+      },
+      {
+        "price": 1251.1,
+        "volume": 490
+      },
+      {
+        "price": 1251.0,
+        "volume": 610
+      },
+      {
+        "price": 1250.9,
+        "volume": 690
+      },
+      {
+        "price": 1250.8,
+        "volume": 810
+      },
+      {
+        "price": 1250.7,
+        "volume": 890
+      },
+      {
+        "price": 1250.6,
+        "volume": 1010
+      }
+    ],
+    "last_trade": {
+      "price": 1251.5,
+      "side": "Sell",
+      "timestamp": 1001,
+      "volume": 7
+    },
+    "last_trade_price": 1251.5,
+    "malformed": false,
+    "spread": 0.1,
+    "symbol": "VN30F1M",
+    "timestamp": 1001,
+    "total_bid_qty": 5500,
+    "total_offer_qty": 1550
+  },
+  {
+    "asks": [
+      {
+        "price": 1251.7,
+        "volume": 105
+      },
+      {
+        "price": 1251.8,
+        "volume": 115
+      },
+      {
+        "price": 1251.9,
+        "volume": 125
+      },
+      {
+        "price": 1252.0,
+        "volume": 135
+      },
+      {
+        "price": 1252.1,
+        "volume": 145
+      },
+      {
+        "price": 1252.2,
+        "volume": 155
+      },
+      {
+        "price": 1252.3,
+        "volume": 165
+      },
+      {
+        "price": 1252.4,
+        "volume": 175
+      },
+      {
+        "price": 1252.5,
+        "volume": 185
+      },
+      {
+        "price": 1252.6,
+        "volume": 195
+      }
+    ],
+    "best_ask": 1251.7,
+    "best_bid": 1251.6,
+    "bids": [
+      {
+        "price": 1251.6,
+        "volume": 80
+      },
+      {
+        "price": 1251.5,
+        "volume": 220
+      },
+      {
+        "price": 1251.4,
+        "volume": 280
+      },
+      {
+        "price": 1251.3,
+        "volume": 420
+      },
+      {
+        "price": 1251.2,
+        "volume": 480
+      },
+      {
+        "price": 1251.1,
+        "volume": 620
+      },
+      {
+        "price": 1251.0,
+        "volume": 680
+      },
+      {
+        "price": 1250.9,
+        "volume": 820
+      },
+      {
+        "price": 1250.8,
+        "volume": 880
+      },
+      {
+        "price": 1250.7,
+        "volume": 920
+      }
+    ],
+    "last_trade": {
+      "price": 1251.6,
+      "side": "Buy",
+      "timestamp": 1002,
+      "volume": 3
+    },
+    "last_trade_price": 1251.6,
+    "malformed": false,
+    "spread": 0.1,
+    "symbol": "VN30F1M",
+    "timestamp": 1002,
+    "total_bid_qty": 5400,
+    "total_offer_qty": 1500
+  }
+]

@@ -1,0 +1,56 @@
+{
+  "symbol": "VN30F1M",
+  "payloads": [
+    {
+      "symbol": "VN30F1M",
+      "timestamp": 1000,
+      "datetime": "2026-07-08T09:00:00+07:00",
+      "total_bid_qty": 5500,
+      "total_offer_qty": 1550,
+      "bid_prices": [1251.4, 1251.3, 1251.2, 1251.1, 1251.0, 1250.9, 1250.8, 1250.7, 1250.6, 1250.5],
+      "bid_volumes": [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000],
+      "offer_prices": [1251.5, 1251.6, 1251.7, 1251.8, 1251.9, 1252.0, 1252.1, 1252.2, 1252.3, 1252.4],
+      "offer_volumes": [110, 120, 130, 140, 150, 160, 170, 180, 190, 200],
+      "last_trade_price": 1251.4,
+      "last_trade_volume": 5,
+      "last_trade_side": "B",
+      "last_trade_timestamp": 1000
+    },
+    {
+      "symbol": "VN30F1M",
+      "timestamp": 1001,
+      "datetime": null,
+      "total_bid_qty": 5500,
+      "total_offer_qty": 1550,
+      "bid_prices": [1251.5, 1251.4, 1251.3, 1251.2, 1251.1, 1251.0, 1250.9, 1250.8, 1250.7, 1250.6],
+      "bid_volumes": [90, 210, 290, 410, 490, 610, 690, 810, 890, 1010],
+      "offer_prices": [1251.6, 1251.7, 1251.8, 1251.9, 1252.0, 1252.1, 1252.2, 1252.3, 1252.4, 1252.5],
+      "offer_volumes": [115, 125, 135, 145, 155, 165, 175, 185, 195, 155],
+      "last_trade_price": 1251.5,
+      "last_trade_volume": 7,
+      "last_trade_side": "S",
+      "last_trade_timestamp": null
+    },
+    {
+      "symbol": "VN30F1M",
+      "timestamp": 1002,
+      "datetime": "2026-07-08T09:00:02+07:00",
+      "total_bid_qty": 5400,
+      "total_offer_qty": 1500,
+      "bid_prices": [1251.6, 1251.5, 1251.4, 1251.3, 1251.2, 1251.1, 1251.0, 1250.9, 1250.8, 1250.7],
+      "bid_volumes": [80, 220, 280, 420, 480, 620, 680, 820, 880, 920],
+      "offer_prices": [1251.7, 1251.8, 1251.9, 1252.0, 1252.1, 1252.2, 1252.3, 1252.4, 1252.5, 1252.6],
+      "offer_volumes": [105, 115, 125, 135, 145, 155, 165, 175, 185, 195],
+      "last_trade_price": 1251.6,
+      "last_trade_volume": 3,
+      "last_trade_side": "B",
+      "last_trade_timestamp": 1002
+    }
+  ],
+  "ticks": [
+    { "price": 1251.4, "volume": 5, "side": "B", "timestamp": 1000 },
+    { "price": 1251.5, "volume": 7, "side": "S", "timestamp": 1001 },
+    { "price": 1251.6, "volume": 3, "side": "B", "timestamp": 1002 }
+  ],
+  "latest_tick": null
+}

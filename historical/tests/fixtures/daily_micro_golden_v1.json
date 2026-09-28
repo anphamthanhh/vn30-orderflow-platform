@@ -1,0 +1,187 @@
+{
+  "schema": "daily_micro.golden/1",
+  "provenance": "Reference values computed at 50 significant digits with python `decimal`, from the formulas as published: Corwin & Schultz (2012) JF 67(2) 719-760 eqs (7)/(10)/(14)/(18); Roll (1984) JF 39(4) 1127-1139; Amihud (2002) JFM 5(1) 31-56. This arithmetic path shares NO code with historical/l2/producers/daily_micro.py, which is float64. Cases marked closed_form carry an expected value derived algebraically by hand (see the `derivation` field); those are the anchors - the decimal numbers only confirm them.",
+  "cs": [
+    {
+      "id": "zero_volatility_identity",
+      "closed_form": true,
+      "derivation": "P=1000, S=0.01 -> H1=H2=1005, L1=L2=995. k=ln(1005/995); beta=2k^2; gamma=k^2 (two-day range == one-day range); alpha=k because (2-sqrt2)/(sqrt2-1)^2 - 1/(sqrt2-1) = (2+sqrt2)-(1+sqrt2) = 1; S_hat = 2(e^k-1)/(1+e^k) = S = 0.01 EXACTLY.",
+      "input": {
+        "h1": 1005.0,
+        "l1": 995.0,
+        "h2": 1005.0,
+        "l2": 995.0
+      },
+      "expect": {
+        "beta": "0.00020000333339722353177395894474367671931742409380558",
+        "gamma": "0.00010000166669861176588697947237183835965871204690279",
+        "alpha": "0.010000083334583355655195941417711253323318180475126",
+        "spread_frac": "0.01"
+      },
+      "decimal_check": {
+        "beta": "0.00020000333339722353177395894474367671931742409380558",
+        "gamma": "0.00010000166669861176588697947237183835965871204690279",
+        "alpha": "0.010000083334583355655195941417711253323318180475113",
+        "spread_frac": "0.0099999999999999999999999999999999999999999999999532"
+      }
+    },
+    {
+      "id": "general_two_day",
+      "closed_form": false,
+      "derivation": "50-digit decimal evaluation of eqs (7)/(10)/(18)/(14) on H1=101 L1=98 H2=103 L2=100.",
+      "input": {
+        "h1": 101.0,
+        "l1": 98.0,
+        "h2": 103.0,
+        "l2": 100.0
+      },
+      "expect": {
+        "beta": "0.0017829285008776696688338744772381587592011458830220",
+        "gamma": "0.0024762078335968030327740837899863587864698015056259",
+        "alpha": "-0.01819537606554270759857635808207130796955945668247",
+        "spread_frac": "-0.018194874084305951178315770952441958065259561177069"
+      }
+    },
+    {
+      "id": "negative_alpha",
+      "closed_form": false,
+      "derivation": "Two narrow ranges far apart: gamma >> beta drives alpha < 0 and S < 0, the routine C&S outcome the negative_rule policy exists for.",
+      "input": {
+        "h1": 100.0,
+        "l1": 99.5,
+        "h2": 105.0,
+        "l2": 104.5
+      },
+      "expect": {
+        "beta": "0.000047909765583353859868975030922623921483397712999186",
+        "gamma": "0.0028947311721666462653755118068013153601739273745508",
+        "alpha": "-0.11318078931454131235777022269444536318565853454984",
+        "spread_frac": "-0.11306012441740992806309397884101998953147144438543"
+      }
+    }
+  ],
+  "roll": [
+    {
+      "id": "alternating_closed_form",
+      "closed_form": true,
+      "derivation": "deltas [2,-2,2,-2]; cov(ddof=1) = -16/3 exactly; S = 2*sqrt(16/3) = 8/sqrt(3).",
+      "input": {
+        "deltas": [
+          2.0,
+          -2.0,
+          2.0,
+          -2.0
+        ],
+        "ddof": 1,
+        "min_pairs": 3
+      },
+      "expect": {
+        "cov": "-5.3333333333333333333333333333333333333333333333333",
+        "spread_pts": "4.6188021535170061160731902440156596451808140101610"
+      },
+      "decimal_check": {
+        "cov": "-5.3333333333333333333333333333333333333333333333335",
+        "spread_pts": "4.6188021535170061160731902440156596451808140101610"
+      }
+    },
+    {
+      "id": "positive_covariance_undefined",
+      "closed_form": false,
+      "derivation": "A monotone run of price changes has POSITIVE lag-1 covariance, so Roll's model does not hold and the estimator has no value.",
+      "input": {
+        "deltas": [
+          1.0,
+          2.0,
+          3.0,
+          4.0,
+          5.0,
+          6.0
+        ],
+        "ddof": 1,
+        "min_pairs": 3
+      },
+      "expect": {
+        "cov": "2.5",
+        "spread_pts": null
+      }
+    },
+    {
+      "id": "general_mixed",
+      "closed_form": false,
+      "derivation": "50-digit decimal evaluation of the lag-1 sample covariance (ddof=1) and 2*sqrt(-cov).",
+      "input": {
+        "deltas": [
+          0.6,
+          -1.1,
+          0.9,
+          -0.4,
+          1.2,
+          -1.5,
+          0.3,
+          -0.7,
+          1.1,
+          -0.2,
+          0.8,
+          -1.3
+        ],
+        "ddof": 1,
+        "min_pairs": 10
+      },
+      "expect": {
+        "cov": "-0.7058181818181818181818181818181818181818181818182",
+        "spread_pts": "1.6802597201839741991474467474947214937624461106644"
+      }
+    }
+  ],
+  "amihud": [
+    {
+      "id": "hand_computed_window",
+      "closed_form": true,
+      "derivation": "returns [0.02, -0.01], turnovers [2e6, 1e6], scale 1e6 -> terms [0.01, 0.01] -> mean exactly 0.01.",
+      "input": {
+        "returns": [
+          0.02,
+          -0.01
+        ],
+        "turnovers": [
+          2000000.0,
+          1000000.0
+        ],
+        "scale": 1000000.0,
+        "min_obs": 2
+      },
+      "expect": {
+        "illiq": "0.01"
+      },
+      "decimal_check": {
+        "illiq": "0.01"
+      }
+    },
+    {
+      "id": "general_window",
+      "closed_form": false,
+      "derivation": "50-digit decimal evaluation of mean(|r|/(turnover/1e6)) over five sessions.",
+      "input": {
+        "returns": [
+          0.013,
+          -0.007,
+          0.0021,
+          -0.019,
+          0.004
+        ],
+        "turnovers": [
+          3100000.0,
+          1700000.0,
+          5200000.0,
+          900000.0,
+          2400000.0
+        ],
+        "scale": 1000000.0,
+        "min_obs": 5
+      },
+      "expect": {
+        "illiq": "0.0062985638755088470458489433821502132697578617882224"
+      }
+    }
+  ]
+}

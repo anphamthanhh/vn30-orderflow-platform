@@ -1,0 +1,298 @@
+[
+  {
+    "asks": [
+      {
+        "price": 1251.1,
+        "volume": 35
+      },
+      {
+        "price": 1251.2,
+        "volume": 25
+      }
+    ],
+    "best_ask": 1251.1,
+    "best_bid": 1251.0,
+    "bids": [
+      {
+        "price": 1251.0,
+        "volume": 40
+      },
+      {
+        "price": 1250.9,
+        "volume": 30
+      }
+    ],
+    "last_trade": {
+      "price": 1251.0,
+      "side": "Buy",
+      "timestamp": 4000,
+      "volume": 2
+    },
+    "last_trade_price": 1251.0,
+    "malformed": false,
+    "spread": 0.1,
+    "symbol": "VN30F1M",
+    "timestamp": 4000,
+    "total_bid_qty": 70,
+    "total_offer_qty": 60
+  },
+  {
+    "asks": [
+      {
+        "price": 1251.1,
+        "volume": 20
+      },
+      {
+        "price": 1251.1,
+        "volume": 40
+      }
+    ],
+    "best_ask": 1251.1,
+    "best_bid": 1251.0,
+    "bids": [
+      {
+        "price": 1251.0,
+        "volume": 30
+      },
+      {
+        "price": 1251.0,
+        "volume": 40
+      }
+    ],
+    "last_trade": {
+      "price": 1251.0,
+      "side": "Buy",
+      "timestamp": 4000,
+      "volume": 2
+    },
+    "last_trade_price": 1251.0,
+    "malformed": false,
+    "spread": 0.1,
+    "symbol": "VN30F1M",
+    "timestamp": 4000,
+    "total_bid_qty": 70,
+    "total_offer_qty": 60
+  },
+  {
+    "asks": [
+      {
+        "price": 1251.1,
+        "volume": 33
+      },
+      {
+        "price": 1251.2,
+        "volume": 22
+      }
+    ],
+    "best_ask": 1251.1,
+    "best_bid": 1251.0,
+    "bids": [
+      {
+        "price": 1251.0,
+        "volume": 38
+      },
+      {
+        "price": 1250.9,
+        "volume": 27
+      }
+    ],
+    "last_trade": {
+      "price": 1251.0,
+      "side": "Buy",
+      "timestamp": 4000,
+      "volume": 2
+    },
+    "last_trade_price": 1251.0,
+    "malformed": false,
+    "spread": 0.1,
+    "symbol": "VN30F1M",
+    "timestamp": 4000,
+    "total_bid_qty": 65,
+    "total_offer_qty": 55
+  },
+  {
+    "asks": [
+      {
+        "price": 1251.1,
+        "volume": 31
+      },
+      {
+        "price": 1251.2,
+        "volume": 19
+      }
+    ],
+    "best_ask": 1251.1,
+    "best_bid": 1251.0,
+    "bids": [
+      {
+        "price": 1251.0,
+        "volume": 36
+      },
+      {
+        "price": 1250.9,
+        "volume": 24
+      }
+    ],
+    "last_trade": {
+      "price": 1251.0,
+      "side": "Buy",
+      "timestamp": 4000,
+      "volume": 2
+    },
+    "last_trade_price": 1251.0,
+    "malformed": false,
+    "spread": 0.1,
+    "symbol": "VN30F1M",
+    "timestamp": 4000,
+    "total_bid_qty": 60,
+    "total_offer_qty": 50
+  },
+  {
+    "asks": [
+      {
+        "price": 1251.1,
+        "volume": 29
+      },
+      {
+        "price": 1251.2,
+        "volume": 16
+      }
+    ],
+    "best_ask": 1251.1,
+    "best_bid": 1251.0,
+    "bids": [
+      {
+        "price": 1251.0,
+        "volume": 34
+      },
+      {
+        "price": 1250.9,
+        "volume": 21
+      }
+    ],
+    "last_trade": {
+      "price": 1251.0,
+      "side": "Buy",
+      "timestamp": 4000,
+      "volume": 2
+    },
+    "last_trade_price": 1251.0,
+    "malformed": false,
+    "spread": 0.1,
+    "symbol": "VN30F1M",
+    "timestamp": 4000,
+    "total_bid_qty": 55,
+    "total_offer_qty": 45
+  },
+  {
+    "asks": [
+      {
+        "price": 1251.1,
+        "volume": 27
+      },
+      {
+        "price": 1251.2,
+        "volume": 13
+      }
+    ],
+    "best_ask": 1251.1,
+    "best_bid": 1251.0,
+    "bids": [
+      {
+        "price": 1251.0,
+        "volume": 32
+      },
+      {
+        "price": 1250.9,
+        "volume": 18
+      }
+    ],
+    "last_trade": {
+      "price": 1251.0,
+      "side": "Buy",
+      "timestamp": 4000,
+      "volume": 2
+    },
+    "last_trade_price": 1251.0,
+    "malformed": false,
+    "spread": 0.1,
+    "symbol": "VN30F1M",
+    "timestamp": 4000,
+    "total_bid_qty": 50,
+    "total_offer_qty": 40
+  },
+  {
+    "asks": [
+      {
+        "price": 1251.1,
+        "volume": 25
+      },
+      {
+        "price": 1251.2,
+        "volume": 10
+      }
+    ],
+    "best_ask": 1251.1,
+    "best_bid": 1251.0,
+    "bids": [
+      {
+        "price": 1251.0,
+        "volume": 30
+      },
+      {
+        "price": 1250.9,
+        "volume": 15
+      }
+    ],
+    "last_trade": {
+      "price": 1251.0,
+      "side": "Buy",
+      "timestamp": 4000,
+      "volume": 2
+    },
+    "last_trade_price": 1251.0,
+    "malformed": false,
+    "spread": 0.1,
+    "symbol": "VN30F1M",
+    "timestamp": 4000,
+    "total_bid_qty": 45,
+    "total_offer_qty": 35
+  },
+  {
+    "asks": [
+      {
+        "price": 1251.1,
+        "volume": 23
+      },
+      {
+        "price": 1251.2,
+        "volume": 7
+      }
+    ],
+    "best_ask": 1251.1,
+    "best_bid": 1251.0,
+    "bids": [
+      {
+        "price": 1251.0,
+        "volume": 28
+      },
+      {
+        "price": 1250.9,
+        "volume": 12
+      }
+    ],
+    "last_trade": {
+      "price": 1251.0,
+      "side": "Buy",
+      "timestamp": 4000,
+      "volume": 2
+    },
+    "last_trade_price": 1251.0,
+    "malformed": false,
+    "spread": 0.1,
+    "symbol": "VN30F1M",
+    "timestamp": 4000,
+    "total_bid_qty": 40,
+    "total_offer_qty": 30
+  }
+]

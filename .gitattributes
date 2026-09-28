@@ -1,0 +1,16 @@
+* text=auto eol=lf
+# Fixtures are pinned by the SHA-256 of their LF bytes: never let checkout rewrite line endings.
+*.csv text eol=lf
+*.json text eol=lf
+*.jsonl text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.rs text eol=lf
+*.toml text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.png binary
+*.gif binary
+*.jpg binary
+*.jpeg binary
+*.webp binary

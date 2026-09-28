@@ -1,0 +1,72 @@
+# ob_spread_pts_v1: quoted spread offer_prices[0] - bid_prices[0], in points, end-of-minute.
+# The observed spread; ob_spread_cs_pts_v1 and ob_spread_roll_pts_v1 are estimates of it.
+# Not clamped at zero: a crossed book gives a negative value, as in market-dom-engine.
+schema: l2.feature/1
+feature: ob_spread_pts_v1
+family: ob
+title: Quoted best-offer minus best-bid spread, end-of-minute
+unit: pts
+dtype: float64
+cadence: m1                 # per_update is refused by feature_boundary (size budget)
+
+signal:
+  causal: true
+  lookahead_ms: 0
+  window_start_rule: bar_open
+  event_time_rule: bar_close      # the value became knowable at the minute's last update
+  is_final_rule: every_bar
+
+inputs:
+  - layer: L0
+    table: default.vn30f_orderbook
+    columns: [event_timestamp, bid_prices, offer_prices]
+depends_on: []
+
+params:
+  default:
+    cadence: m1
+    symbol_scope: single
+    session_reset: none         # a state quantity: nothing accumulates, nothing resets
+    seam_13h: none              # minute buckets are discrete, so none spans the lunch break
+    warmup_bars: 0
+    levels: 1                   # top of book only; the deeper levels cannot change a spread
+    agg: last                   # end-of-minute book state; see `note`
+    stale_ms: 0                 # no carry-forward: a minute with no update emits no row
+
+impl:
+  rust: native_platform/crates/market-dom-engine/src/lib.rs::spread_from_best_levels
+  python: historical/l2/producers/book_cost.py::spread_pts
+  authority: rust
+
+parity:
+  tolerance: 0                # bitwise: one f64 subtraction of two quoted prices on both stacks
+  tolerance_reason: null
+  golden_tape: historical/tests/fixtures/book_cost_book_synthetic_20210304_20210305.csv
+  test: historical/tests/test_l2_book_cost.py::test_spread_matches_hand_computed_golden_vector
+  parity_waiver: null         # not allowed: both stacks implement this feature
+
+derives_trigger: null
+maps_to_validation_state: offline-replayed
+
+status: IMPLEMENTED
+pinned_code_version: null
+supersedes: null
+superseded_by: null
+retention: unbounded
+note: >-
+  `agg: last` is the end-of-minute book state - what a once-a-minute subscriber sees,
+  and what the Signal Atlas book-family detector (not distributed) already takes per second. For a STATE quantity
+  that is a definition rather than an average, so the measured skew of the spread
+  distribution (1 tick 32%, 2 ticks 28%, 3 ticks 22%, 4 ticks 11%; median 0.2 pt) does not
+  bias it the way a within-minute mean would. The analytically better reduction for that
+  skew is the within-minute MEDIAN, and feature_boundary's `agg` vocabulary
+  (last/first/max/min/mean/sum) does not contain it; widening the gate to fit a feature is
+  not something a feature branch does. Recorded in next_action.
+next_action: >-
+  TWO items owed, neither of them done here. (1) PARITY: market-dom-engine computes this
+  exact quantity, so a waiver is forbidden and the feature stays at IMPLEMENTED until a
+  Rust dump exists to diff against. Emitting one means editing
+  orderflow-engine/src/bin/l2_dump.rs, which a parallel branch holds; this branch did not
+  contend for the file. (2) `agg: median` needs a feature_boundary vocabulary change (an
+  ADR-level edit to a closed set), after which a `median` param set can be added here
+  without changing what `default` means.

@@ -1,0 +1,84 @@
+# ob_illiq_amihud_v1: Amihud (2002) illiquidity, the window mean of |return| / turnover.
+# Its magnitude depends on the turnover unit, so `turnover_scale` is a declared parameter
+# (part of param_set_id) and the unit names the ratio. It measures price impact, not a spread.
+schema: l2.feature/1
+feature: ob_illiq_amihud_v1
+family: ob
+title: Amihud illiquidity, mean of |daily return| per million points of turnover
+unit: ret_per_mpts          # |simple return| divided by (contracts * points / 1e6)
+dtype: float64
+cadence: session
+
+signal:
+  causal: true
+  lookahead_ms: 0
+  window_start_rule: trailing_window   # the 21 sessions ending at D, never centred
+  event_time_rule: session_close
+  is_final_rule: session_close
+
+inputs:
+  - layer: L1
+    table: default.ohlcv_m1
+    columns: [time_1m, close, volume]
+depends_on: []
+
+params:
+  default:
+    cadence: session
+    symbol_scope: single
+    session_reset: open
+    seam_13h: none
+    warmup_bars: 11           # 10 returns need 11 consecutive sessions
+    levels: 1                 # required for family `ob`; no book level is read
+    agg: mean                 # the window mean is part of the estimator's definition
+    stale_ms: 0
+    session: calendar_day
+    window: {value: 21, unit: session}
+    return_type: simple       # close / close_prev - 1, as in Amihud (2002)
+    turnover_scale: 1000000   # denominator = volume * close / 1e6 (million contract-points)
+    min_obs: 10               # fewer usable returns in the window -> undefined
+    zero_turnover: skip       # a zero-turnover session contributes nothing
+    gap_policy: drop_data_gap # a return across a gap in the tape is not a daily return
+    roll_boundary: exclude    # nor is a return across the contract roll
+
+impl:
+  rust: null                  # the live engine computes no daily-cadence estimator
+  python: historical/l2/producers/daily_micro.py::produce
+  authority: python
+
+parity:
+  tolerance: 0
+  tolerance_reason: null
+  golden_tape: historical/tests/fixtures/daily_micro_golden_v1.json
+  test: historical/tests/test_l2_daily_micro.py::test_amihud_golden_hand_computed_window
+  parity_waiver: >-
+    No Rust implementation exists and none is planned: the live engine computes no
+    daily-cadence estimator, so a cross-stack comparison is undefined rather than
+    merely unwritten. The substitute evidence is in
+    historical/tests/test_l2_daily_micro.py: (1) a golden vector whose expected value
+    is exact decimal arithmetic done by hand - returns [0.02, -0.01] against turnovers
+    of 2e6 and 1e6 give terms [0.01, 0.01] and a mean of exactly 0.01; (2) a 50-digit
+    decimal re-implementation frozen in fixtures/daily_micro_golden_v1.json; (3)
+    property invariants, in particular strict monotonicity in volume at fixed |r|;
+    (4) a mutation test on the turnover scale. If a Rust implementation ever lands,
+    this waiver must be DELETED and replaced by a parity test.
+
+derives_trigger: null
+maps_to_validation_state: offline-replayed
+
+status: IMPLEMENTED
+pinned_code_version: null
+supersedes: null
+superseded_by: null
+retention: unbounded
+note: >-
+  Ships with ob_spread_cs_pts_v1 and ob_spread_roll_pts_v1 as three INDEPENDENT
+  estimators of liquidity; agreement is evidence, disagreement localises a
+  mis-specification. Amihud is defined on every session with a usable return, so it
+  is the widest-coverage of the three and is the natural reference when the other two
+  disagree about a period.
+next_action: >-
+  Status is IMPLEMENTED, not PARITY: nothing is backfilled and migration
+  009_l2_observations.sql is unapplied, so this feature writes no rows.
+  test_registry_entry_passes_the_writeable_gate asserts the entry would pass the
+  writeable-status gate as written.

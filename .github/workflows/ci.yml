@@ -1,0 +1,102 @@
+# Everything runs offline on seeded synthetic data: no broker, database, Redis or secrets are needed.
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_TOOLCHAIN: "1.94.0" # keep in step with native_platform/rust-toolchain.toml
+  PYTHON_VERSION: "3.13"
+
+jobs:
+  rust:
+    name: Rust · fmt, clippy, tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: native_platform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@fef00d40025f7fd8f1ec759cbbb0f577ddfc3133 # branch 1.94.0
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: native_platform
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - run: cargo test --workspace --locked
+
+  python:
+    name: Python · tests with Rust parity, fixture check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - uses: dtolnay/rust-toolchain@fef00d40025f7fd8f1ec759cbbb0f577ddfc3133 # branch 1.94.0
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          components: rustfmt, clippy # listed in rust-toolchain.toml
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: native_platform
+      - run: pip install -r requirements.txt
+      - name: Tests (the parity tests build and run the Rust half)
+        run: python -m pytest -q
+      - name: Synthetic fixtures regenerate byte for byte
+        run: python samples/generate-fixtures.py --check
+
+  demos:
+    name: Demos · offline, synthetic data
+    runs-on: ubuntu-latest
+    needs: python
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - uses: dtolnay/rust-toolchain@fef00d40025f7fd8f1ec759cbbb0f577ddfc3133 # branch 1.94.0
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          components: rustfmt, clippy # listed in rust-toolchain.toml
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: native_platform
+      - run: pip install -r requirements.txt
+      - run: python demos/run-all.py
+        env:
+          MPLBACKEND: Agg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: demo-outputs
+          path: samples/outputs/
+          retention-days: 30
+
+  secrets:
+    name: Secret scan · full history
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        env:
+          GITLEAKS_VERSION: "8.18.4"
+        run: |
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" | tar -xz gitleaks
+          ./gitleaks detect --source . --redact --verbose --no-banner

@@ -1,0 +1,20 @@
+[package]
+name = "client-proto"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[dependencies]
+serde.workspace = true
+market-dom-viewmodel = { path = "../market-dom-viewmodel" }
+market-profile-viewmodel = { path = "../market-profile-viewmodel" }
+
+[dev-dependencies]
+serde_json.workspace = true
+# Only for examples/loopback_latency.rs.
+hdrhistogram.workspace = true
+
+[lints]
+workspace = true

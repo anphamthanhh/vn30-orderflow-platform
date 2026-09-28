@@ -1,0 +1,81 @@
+# ob_microprice_pts_v1: Stoikov size-weighted mid, in points, end-of-minute.
+#   p_micro = (q_ask * P_bid + q_bid * P_ask) / (q_ask + q_bid)
+# Stoikov, "The micro-price: a high-frequency estimator of future prices",
+# Quantitative Finance 18(12), 2018, 1959-1966.
+
+# The weights are crossed (ask size multiplies the bid price); the swapped form also lies
+# between the quotes, so only a golden vector catches it. Distinct from the arithmetic `mid`.
+schema: l2.feature/1
+feature: ob_microprice_pts_v1
+family: ob
+title: Size-weighted mid price (Stoikov micro-price), end-of-minute
+unit: pts
+dtype: float64
+cadence: m1
+
+signal:
+  causal: true
+  lookahead_ms: 0
+  window_start_rule: bar_open
+  event_time_rule: bar_close
+  is_final_rule: every_bar
+
+inputs:
+  - layer: L0
+    table: default.vn30f_orderbook
+    columns: [event_timestamp, bid_prices, bid_volumes, offer_prices, offer_volumes]
+depends_on: []
+
+params:
+  default:
+    cadence: m1
+    symbol_scope: single
+    session_reset: none
+    seam_13h: none
+    warmup_bars: 0
+    levels: 1                   # top of book; a depth-weighted variant is a new feature
+    agg: last
+    stale_ms: 0
+
+impl:
+  rust: null
+  python: historical/l2/producers/book_cost.py::microprice_pts
+  authority: python
+
+parity:
+  tolerance: 0
+  tolerance_reason: null
+  golden_tape: historical/tests/fixtures/book_cost_book_synthetic_20210304_20210305.csv
+  test: historical/tests/test_l2_book_cost.py::test_microprice_matches_hand_computed_golden_vector
+  parity_waiver: >-
+    No Rust implementation exists to compare against. market-types/src/lib.rs::mid is the
+    ARITHMETIC mid ((bid+ask)/2, unweighted) and market-dom-engine carries no weighted
+    price at all, so there is no second implementation of THIS formula in the repo and
+    nothing for a cross-stack diff to run on. Declaring impl.rust as `mid` to satisfy a
+    parity gate would assert that two different formulas are one quantity, which is the
+    exact defect ADR 0037 was written to stop. The cross-stack comparison is replaced by
+    three checks in the named test: a hand-computed golden vector on dyadic prices whose
+    every step is exact in f64 and is worked out in the test docstring; a property test
+    that the value lies within [best bid, best offer] on every state of the frozen fixture (6,581 real states in the original) plus
+    randomised books; and a mutation test that swaps the two weights - the mutant stays
+    inside the quotes, so only the golden vector kills it.
+
+derives_trigger: null
+maps_to_validation_state: offline-replayed
+
+status: PARITY
+pinned_code_version: null
+supersedes: null
+superseded_by: null
+retention: unbounded
+note: >-
+  Falls back to the arithmetic mid when BOTH top-of-book queues are empty. That cannot
+  happen on this feed - 0 zero-volume levels in 22,012,608 rows - but a division by zero
+  is not an acceptable answer to a case that cannot happen, because "cannot happen" is a
+  claim about a feed, not about arithmetic.
+next_action: >-
+  Owed: `agg: median` is the analytically better within-minute reduction for a skewed
+  distribution and is not in feature_boundary's closed `agg` vocabulary; adding it is a
+  gate change, not a feature-branch edit. Also owed: if a Rust micro-price is ever
+  written, this waiver must be deleted and replaced by a real bitwise parity test - the
+  gate refuses a waiver as soon as both stacks implement a feature.

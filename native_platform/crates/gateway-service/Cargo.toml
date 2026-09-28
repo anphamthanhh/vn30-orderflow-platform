@@ -1,0 +1,25 @@
+[package]
+name = "gateway-service"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[dependencies]
+thiserror.workspace = true
+async-trait.workspace = true
+chrono.workspace = true
+log.workspace = true
+market-data-core = { path = "../market-data-core" }
+market-profile-engine = { path = "../market-profile-engine" }
+market-profile-viewmodel = { path = "../market-profile-viewmodel" }
+market-time = { path = "../market-time" }
+market-types = { path = "../market-types" }
+client-proto = { path = "../client-proto" }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+
+[lints]
+workspace = true

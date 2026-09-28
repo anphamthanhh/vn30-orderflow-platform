@@ -1,0 +1,108 @@
+[
+  {
+    "asks": [],
+    "best_ask": null,
+    "best_bid": 1248.0,
+    "bids": [
+      {
+        "price": 1248.0,
+        "volume": 60
+      },
+      {
+        "price": 1247.9,
+        "volume": 40
+      },
+      {
+        "price": 1247.8,
+        "volume": 20
+      }
+    ],
+    "last_trade": {
+      "price": 1248.0,
+      "side": "Buy",
+      "timestamp": 3000,
+      "volume": 1
+    },
+    "last_trade_price": 1248.0,
+    "malformed": false,
+    "spread": null,
+    "symbol": "VN30F1M",
+    "timestamp": 3000,
+    "total_bid_qty": 120,
+    "total_offer_qty": 0
+  },
+  {
+    "asks": [],
+    "best_ask": null,
+    "best_bid": 1248.1,
+    "bids": [
+      {
+        "price": 1248.1,
+        "volume": 45
+      },
+      {
+        "price": 1248.0,
+        "volume": 30
+      }
+    ],
+    "last_trade": null,
+    "last_trade_price": 1248.1,
+    "malformed": false,
+    "spread": null,
+    "symbol": "VN30F1M",
+    "timestamp": 3001,
+    "total_bid_qty": 75,
+    "total_offer_qty": 0
+  },
+  {
+    "asks": [
+      {
+        "price": 1248.2,
+        "volume": 50
+      },
+      {
+        "price": 1248.3,
+        "volume": 35
+      },
+      {
+        "price": 1248.4,
+        "volume": 25
+      }
+    ],
+    "best_ask": 1248.2,
+    "best_bid": null,
+    "bids": [],
+    "last_trade": {
+      "price": 1248.2,
+      "side": "Sell",
+      "timestamp": 3002,
+      "volume": 3
+    },
+    "last_trade_price": 1248.2,
+    "malformed": false,
+    "spread": null,
+    "symbol": "VN30F1M",
+    "timestamp": 3002,
+    "total_bid_qty": 0,
+    "total_offer_qty": 110
+  },
+  {
+    "asks": [],
+    "best_ask": null,
+    "best_bid": null,
+    "bids": [],
+    "last_trade": {
+      "price": 1248.3,
+      "side": "Sell",
+      "timestamp": 3003,
+      "volume": 4
+    },
+    "last_trade_price": 1248.3,
+    "malformed": false,
+    "spread": null,
+    "symbol": "VN30F1M",
+    "timestamp": 3003,
+    "total_bid_qty": 0,
+    "total_offer_qty": 0
+  }
+]

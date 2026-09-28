@@ -1,0 +1,11 @@
+{
+  "description": "Two-level tie NOT at mid-range: max volume 80 tied at 1200.1 and 1200.2; mid-range is 1200.45, so 1200.2 (distance 0.25) beats 1200.1 (distance 0.35). Old first-max behavior would have picked 1200.1. POC lands on the VA high edge here.",
+  "value_area_pct": 0.7,
+  "levels": [
+    { "price": 1200.0, "volume": 10 },
+    { "price": 1200.1, "volume": 80 },
+    { "price": 1200.2, "volume": 80 },
+    { "price": 1200.9, "volume": 10 }
+  ],
+  "expected": { "poc": 1200.2, "vah": 1200.2, "val": 1200.1, "va_volume": 160 }
+}

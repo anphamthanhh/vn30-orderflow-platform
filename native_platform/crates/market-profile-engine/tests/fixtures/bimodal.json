@@ -1,0 +1,13 @@
+{
+  "description": "Bimodal profile: peaks at 1250.1 (200) and 1250.4 (180). Unique max -> POC 1250.1, single-level greedy expansion walks: +1250.2, +1250.0, +1250.3, +1250.4 (530 >= 409.5).",
+  "value_area_pct": 0.7,
+  "levels": [
+    { "price": 1250.0, "volume": 50 },
+    { "price": 1250.1, "volume": 200 },
+    { "price": 1250.2, "volume": 60 },
+    { "price": 1250.3, "volume": 40 },
+    { "price": 1250.4, "volume": 180 },
+    { "price": 1250.5, "volume": 55 }
+  ],
+  "expected": { "poc": 1250.1, "vah": 1250.4, "val": 1250.0, "va_volume": 530 }
+}

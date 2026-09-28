@@ -1,0 +1,67 @@
+{
+  "symbol": "VN30F1M",
+  "payloads": [
+    {
+      "symbol": "VN30F1M",
+      "timestamp": 3000,
+      "datetime": null,
+      "total_bid_qty": 120,
+      "total_offer_qty": 0,
+      "bid_prices": [1248.0, 1247.9, 1247.8],
+      "bid_volumes": [60, 40, 20],
+      "offer_prices": [],
+      "offer_volumes": [],
+      "last_trade_price": 1248.0,
+      "last_trade_volume": 1,
+      "last_trade_side": "B",
+      "last_trade_timestamp": 3000
+    },
+    {
+      "symbol": "VN30F1M",
+      "timestamp": 3001,
+      "datetime": null,
+      "total_bid_qty": 75,
+      "total_offer_qty": 0,
+      "bid_prices": [1248.1, 1248.0],
+      "bid_volumes": [45, 30],
+      "offer_prices": [],
+      "offer_volumes": [],
+      "last_trade_price": 1248.1,
+      "last_trade_volume": 2,
+      "last_trade_side": "",
+      "last_trade_timestamp": 3001
+    },
+    {
+      "symbol": "VN30F1M",
+      "timestamp": 3002,
+      "datetime": null,
+      "total_bid_qty": 0,
+      "total_offer_qty": 110,
+      "bid_prices": [],
+      "bid_volumes": [],
+      "offer_prices": [1248.2, 1248.3, 1248.4],
+      "offer_volumes": [50, 35, 25],
+      "last_trade_price": 1248.2,
+      "last_trade_volume": 3,
+      "last_trade_side": "S",
+      "last_trade_timestamp": 3002
+    },
+    {
+      "symbol": "VN30F1M",
+      "timestamp": 3003,
+      "datetime": null,
+      "total_bid_qty": 0,
+      "total_offer_qty": 0,
+      "bid_prices": [],
+      "bid_volumes": [],
+      "offer_prices": [],
+      "offer_volumes": [],
+      "last_trade_price": 1248.3,
+      "last_trade_volume": 4,
+      "last_trade_side": "S",
+      "last_trade_timestamp": 3003
+    }
+  ],
+  "ticks": [],
+  "latest_tick": null
+}

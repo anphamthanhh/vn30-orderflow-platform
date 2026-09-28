@@ -1,0 +1,101 @@
+{
+  "symbol": "VN30F1M",
+  "payloads": [
+    {
+      "symbol": "VN30F1M",
+      "timestamp": 2000,
+      "datetime": null,
+      "total_bid_qty": 150,
+      "total_offer_qty": 175,
+      "bid_prices": [1250.0, 1249.9, 1249.8, 1249.7, 1249.6],
+      "bid_volumes": [50, 40, 30, 20, 10],
+      "offer_prices": [1250.1, 1250.2, 1250.3, 1250.4, 1250.5],
+      "offer_volumes": [55, 45, 35, 25, 15],
+      "last_trade_price": 1250.0,
+      "last_trade_volume": 2,
+      "last_trade_side": "B",
+      "last_trade_timestamp": 2000
+    },
+    {
+      "symbol": "VN30F1M",
+      "timestamp": 2001,
+      "datetime": null,
+      "total_bid_qty": 85,
+      "total_offer_qty": 120,
+      "bid_prices": [1250.0, 1249.9, 1249.8],
+      "bid_volumes": [60, 0, 25],
+      "offer_prices": [1250.1, 1250.2, 1250.3, 1250.4],
+      "offer_volumes": [50, 0, 40, 30],
+      "last_trade_price": 1250.1,
+      "last_trade_volume": 4,
+      "last_trade_side": "X",
+      "last_trade_timestamp": 2001
+    },
+    {
+      "symbol": "VN30F1M",
+      "timestamp": 2002,
+      "datetime": null,
+      "total_bid_qty": 95,
+      "total_offer_qty": 90,
+      "bid_prices": [1249.8, 1250.0, 1249.9],
+      "bid_volumes": [30, 45, 20],
+      "offer_prices": [1250.1, 1250.2],
+      "offer_volumes": [50, 40],
+      "last_trade_price": 1250.1,
+      "last_trade_volume": 4,
+      "last_trade_side": "S",
+      "last_trade_timestamp": 2002
+    },
+    {
+      "symbol": "VN30F1M",
+      "timestamp": 2003,
+      "datetime": null,
+      "total_bid_qty": 70,
+      "total_offer_qty": 65,
+      "bid_prices": [1250.3, 1250.2],
+      "bid_volumes": [40, 30],
+      "offer_prices": [1250.1, 1250.2],
+      "offer_volumes": [35, 30],
+      "last_trade_price": 1250.2,
+      "last_trade_volume": 6,
+      "last_trade_side": "B",
+      "last_trade_timestamp": 2003
+    },
+    {
+      "symbol": "VN30F1M",
+      "timestamp": 2004,
+      "datetime": null,
+      "total_bid_qty": 0,
+      "total_offer_qty": 55,
+      "bid_prices": [],
+      "bid_volumes": [],
+      "offer_prices": [1250.2, 1250.3],
+      "offer_volumes": [30, 25],
+      "last_trade_price": 1250.2,
+      "last_trade_volume": 6,
+      "last_trade_side": "B",
+      "last_trade_timestamp": 2004
+    },
+    {
+      "symbol": "VN30F1M",
+      "timestamp": 2005,
+      "datetime": null,
+      "total_bid_qty": 60,
+      "total_offer_qty": 70,
+      "bid_prices": [1250.1, 1250.0],
+      "bid_volumes": [35, 25],
+      "offer_prices": [1250.2, 1250.3],
+      "offer_volumes": [40, 30],
+      "last_trade_price": 1250.2,
+      "last_trade_volume": 1,
+      "last_trade_side": "S",
+      "last_trade_timestamp": 2005
+    }
+  ],
+  "ticks": [
+    { "price": 1250.0, "volume": 2, "side": "B", "timestamp": 2000 },
+    { "price": 1250.1, "volume": 4, "side": "S", "timestamp": 2002 },
+    { "price": 1250.2, "volume": 6, "side": "B", "timestamp": 2004 }
+  ],
+  "latest_tick": { "price": 1249.9, "volume": 1, "side": "S", "timestamp": 1999 }
+}

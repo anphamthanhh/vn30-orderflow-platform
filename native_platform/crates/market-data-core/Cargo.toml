@@ -1,0 +1,15 @@
+[package]
+name = "market-data-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[dependencies]
+thiserror.workspace = true
+async-trait.workspace = true
+market-types = { path = "../market-types" }
+
+[lints]
+workspace = true

@@ -1,0 +1,88 @@
+# ob_spread_cs_pts_v1: Corwin-Schultz (2012) two-day high-low effective spread, in points.
+# An estimate from M1 bars, distinct from the quoted spread (ob_spread_pts_v1) and the Roll
+# estimate (ob_spread_roll_pts_v1). Family `ob` because it measures the cost of crossing.
+# It needs only OHLC, so it covers the full M1 history rather than the shorter tick tape.
+schema: l2.feature/1
+feature: ob_spread_cs_pts_v1
+family: ob
+title: Corwin-Schultz two-day high-low effective spread, in index points
+unit: pts
+dtype: float64
+cadence: session            # one row per ICT trading session (the daily cadence)
+
+signal:
+  causal: true
+  lookahead_ms: 0
+  window_start_rule: prior_session_open   # the estimate spans sessions D-1 and D
+  event_time_rule: session_close          # knowable once D's high and low are final
+  is_final_rule: session_close
+
+inputs:
+  - layer: L1
+    table: default.ohlcv_m1
+    columns: [time_1m, high, low, close]
+depends_on: []
+
+params:
+  default:
+    cadence: session
+    symbol_scope: single      # VN30F1M only; ohlcv_m1 also holds other contracts
+    session_reset: open
+    seam_13h: none            # the ICT lunch break does not split a daily high/low
+    warmup_bars: 1            # one prior session is the whole warmup
+    levels: 1                 # required for family `ob`; no book level is read
+    agg: last                 # one estimate per session pair; nothing to reduce
+    stale_ms: 0               # no book snapshot, so no staleness window exists
+    session: calendar_day     # `daily.daily_bars` groups M1 bars by ICT calendar date
+    window: {value: 1, unit: session}   # one two-day estimate; smoothing is done at query time
+    price_ref: close_d2       # S is proportional; points = S * close(D), known at event time
+    negative_rule: zero       # negative estimates floored at 0, as Corwin and Schultz recommend
+    gap_policy: drop_data_gap # a pair across a gap in the tape is not two consecutive sessions
+    roll_boundary: exclude    # a pair across an expiry would splice two contracts
+
+impl:
+  rust: null                  # daily research estimator; the live engine does not compute it
+  python: historical/l2/producers/daily_micro.py::produce
+  authority: python
+
+parity:
+  tolerance: 0
+  tolerance_reason: null
+  golden_tape: historical/tests/fixtures/daily_micro_golden_v1.json
+  test: historical/tests/test_l2_daily_micro.py::test_cs_golden_zero_volatility_identity
+  parity_waiver: >-
+    No Rust implementation exists and none is planned: the live engine computes no
+    daily-cadence estimator, so a cross-stack comparison is undefined rather than
+    merely unwritten. A bare waiver would be a hole in the admission gate, so it is
+    backed by evidence of a different kind, all in
+    historical/tests/test_l2_daily_micro.py: (1) a golden vector whose expected value
+    comes from Corwin & Schultz's model rather than from this code - under zero
+    efficient-price volatility the estimator is EXACT and alpha collapses to
+    ln((1+S/2)/(1-S/2)), so the test asserts beta, gamma, alpha and S against closed
+    forms; (2) a 50-digit decimal re-implementation written from the paper, frozen in
+    fixtures/daily_micro_golden_v1.json; (3) property invariants; (4) mutation tests -
+    perturbing 3-2*sqrt(2) and mis-pairing the two-day window each turn a named test
+    red. If a Rust implementation ever lands, this waiver must be DELETED and replaced
+    by a parity test; it is a statement about today, not an exemption.
+
+derives_trigger: null
+maps_to_validation_state: offline-replayed
+
+status: IMPLEMENTED
+pinned_code_version: null
+supersedes: null
+superseded_by: null
+retention: unbounded
+note: >-
+  Three estimators of one quantity ship together on purpose (this one, Roll, Amihud):
+  they are independent, so agreement is evidence the measurement is real and
+  disagreement localises a mis-specification. Reading any of them alone throws that
+  away. The Python producer reads data_provider/VN30F1M_Final.csv, validated
+  2026-08-14 as identical to default.ohlcv_m1; the DEV filter is derived from
+  holdout_lock.json and re-asserted by daily.assert_dev_only_daily.
+next_action: >-
+  Status is IMPLEMENTED, not PARITY: the evidence package is green but nothing has
+  been backfilled and migration 009_l2_observations.sql is still unapplied, so this
+  feature writes no rows. test_registry_entry_passes_the_writeable_gate asserts the
+  entry would pass the writeable-status gate as written, so promotion is a one-word
+  edit once an operator decides a waiver-backed feature may be stored.

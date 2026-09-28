@@ -1,0 +1,15 @@
+{
+  "description": "All-tied profile with an EVEN level count: mid-range 1300.35 sits between levels, so 1300.3 and 1300.4 are equidistant. Documented tie-break resolves the remaining distance tie to the HIGHER price -> POC 1300.4.",
+  "value_area_pct": 0.7,
+  "levels": [
+    { "price": 1300.0, "volume": 100 },
+    { "price": 1300.1, "volume": 100 },
+    { "price": 1300.2, "volume": 100 },
+    { "price": 1300.3, "volume": 100 },
+    { "price": 1300.4, "volume": 100 },
+    { "price": 1300.5, "volume": 100 },
+    { "price": 1300.6, "volume": 100 },
+    { "price": 1300.7, "volume": 100 }
+  ],
+  "expected": { "poc": 1300.4, "vah": 1300.5, "val": 1300.0, "va_volume": 600 }
+}

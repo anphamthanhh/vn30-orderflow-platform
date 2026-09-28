@@ -1,0 +1,19 @@
+[package]
+name = "market-dom-viewmodel"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+publish.workspace = true
+
+[dependencies]
+serde.workspace = true
+chrono.workspace = true
+market-types = { path = "../market-types" }
+market-dom-engine = { path = "../market-dom-engine" }
+
+[dev-dependencies]
+proptest.workspace = true
+
+[lints]
+workspace = true

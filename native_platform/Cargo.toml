@@ -1,0 +1,47 @@
+[workspace]
+members = [
+    "crates/market-types",
+    "crates/market-time",
+    "crates/market-data-core",
+    "crates/market-dom-engine",
+    "crates/market-profile-engine",
+    "crates/orderflow-engine",
+    "crates/signal-engine",
+    "crates/strategy-core",
+    "crates/backtest-engine",
+    "crates/market-testkit",
+    "crates/market-dom-viewmodel",
+    "crates/market-profile-viewmodel",
+    "crates/orderflow-viewmodel",
+    "crates/client-proto",
+    "crates/gateway-service",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+version = "0.1.0"
+authors = ["Pham Thanh An"]
+license = "LicenseRef-Evaluation"
+publish = false
+
+[workspace.dependencies]
+thiserror = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std", "serde"] }
+proptest = "1"
+async-trait = "0.1"
+hdrhistogram = { version = "7", default-features = false }
+log = "0.4"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+unused_must_use = "deny"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true

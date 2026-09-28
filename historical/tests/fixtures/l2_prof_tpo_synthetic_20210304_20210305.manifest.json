@@ -1,0 +1,53 @@
+{
+  "fixture": "historical/tests/fixtures/l2_prof_tpo_synthetic_20210304_20210305.csv",
+  "symbol": "VN30F1M",
+  "synthetic": true,
+  "days": [
+    "2021-03-04",
+    "2021-03-05"
+  ],
+  "why_these_days": "Synthetic sessions dated inside the DEV range 2017-11-06..2023-12-31 of holdout_lock.json, so the holdout guard accepts them; neither day is an expiry day (March 2021 expiry is the 18th).",
+  "source": "samples/synthetic/microstructure.py",
+  "generator_params": {
+    "seed": 20260925,
+    "days": [
+      "2021-03-04",
+      "2021-03-05"
+    ],
+    "regimes": [
+      "trend",
+      "balance"
+    ],
+    "start_mid": 1250.0,
+    "trades_per_sec": 3.0,
+    "imbalance_ar": 0.97,
+    "imbalance_sd": 0.25,
+    "trend_ticks_per_min": 0.6,
+    "balance_pull_per_sec": 0.004
+  },
+  "feature": "prof_tpo_poc_pts_v1",
+  "raw_measurements": {
+    "2021-03-04": {
+      "rows_raw": 43418,
+      "rows_kept": 19603,
+      "tpo_cells": 298
+    },
+    "2021-03-05": {
+      "rows_raw": 43343,
+      "rows_kept": 19844,
+      "tpo_cells": 210
+    }
+  },
+  "rows": 39447,
+  "fixture_design": {
+    "levels_per_session": [
+      102,
+      43
+    ],
+    "canonical_tie_break_differs": true
+  },
+  "seed_search": "first seed from 20260924 whose sessions exercise the tie-break and shape tests",
+  "header": "\"event_timestamp\",\"price\"",
+  "sha256_lf": "768ffc6d385b2d0374ed20a0faf0c1932bd974f481f75ebdcab33c25f727394d",
+  "note": "SYNTHETIC. Pins formulas across the Python and Rust implementations; it says nothing about the real market."
+}
